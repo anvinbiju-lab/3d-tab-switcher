@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Visual Tab Switcher - Interactive Preview & Testbed</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      background: radial-gradient(circle at 50% 30%, #161b26 0%, #080a0f 100%);
+      color: #e0e6ed;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-card {
+      background: rgba(22, 27, 36, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 32px 40px;
+      max-width: 650px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(12px);
+    }
+    h1 {
+      margin-top: 0;
+      font-size: 26px;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    h1 span {
+      color: #00e5ff;
+    }
+    p {
+      color: #94a3b8;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .feature-list {
+      text-align: left;
+      background: rgba(14, 18, 25, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 20px 0;
+      font-size: 13px;
+      color: #cbd5e1;
+    }
+    .feature-list li {
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+    .feature-list li:last-child {
+      margin-bottom: 0;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, #00e5ff 0%, #0077ff 100%);
+      color: #040914;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 12px 28px;
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.6);
+    }
+    kbd {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 12px;
+      color: #00e5ff;
+      font-weight: 600;
+    }
+    .status-msg {
+      margin-top: 16px;
+      font-size: 13px;
+      color: #00e5ff;
+      min-height: 20px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-card">
+    <h1><span>3D</span> Visual Tab Switcher</h1>
+    <p>
+      High-performance dark-mode 3D Visual Tab Switcher with customizable shortcut navigation.
+    </p>
+
+    <ul class="feature-list">
+      <li><strong>No arrow keys required:</strong> Press and hold <kbd>Alt</kbd>, then tap <kbd>Q</kbd> repeatedly to cycle through your tabs!</li>
+      <li><strong>Release to switch:</strong> Simply release <kbd>Alt</kbd> to immediately activate the selected tab.</li>
+      <li><strong>Reverse cycle:</strong> Press <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>Q</kbd> to cycle backward.</li>
+      <li><strong>Custom button:</strong> Click the extension icon in the toolbar to change the shortcut button or customize behavior.</li>
+    </ul>
+
+    <button class="btn" id="openBtn">
+      Launch 3D Tab Switcher (Alt+Q)
+    </button>
+
+    <div class="status-msg" id="statusMsg"></div>
+  </div>
+
+  <!-- Mock Extension runtime environment for standalone browser preview -->
+  <script>
+    if (!window.chrome) window.chrome = {};
+    if (!chrome.runtime) chrome.runtime = {};
+    if (!chrome.storage) chrome.storage = {};
+
+    let mockSettings = {
+      customModifier: 'Alt',
+      customKey: 'Q',
+      releaseToSwitch: true,
+      autoAdvanceOnFirstPress: true
+    };
+
+    chrome.storage.sync = {
+      get: function(defaults, callback) {
+        callback({ ...defaults, ...mockSettings });
+      },
+      set: function(newSettings, callback) {
+        mockSettings = { ...mockSettings, ...newSettings };
+        if (callback) callback();
+      }
+    };
+
+    const MOCK_TABS = [
+      {
+        id: 101,
+        title: "GitHub - facebook/react: The library for web and native user interfaces",
+        domain: "github.com",
+        favIconUrl: "https://github.githubassets.com/favicons/favicon.png",
+        active: true,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%230d1117'/%3E%3Crect x='30' y='30' width='140' height='20' rx='4' fill='%2358a6ff' fill-opacity='0.6'/%3E%3Crect x='30' y='65' width='340' height='12' rx='3' fill='%238b949e' fill-opacity='0.3'/%3E%3Crect x='30' y='85' width='280' height='12' rx='3' fill='%238b949e' fill-opacity='0.3'/%3E%3Crect x='30' y='120' width='340' height='100' rx='8' fill='%23161b22' stroke='%2330363d'/%3E%3C/svg%3E"
+      },
+      {
+        id: 102,
+        title: "TypeScript: The starting point for learning TypeScript",
+        domain: "typescriptlang.org",
+        favIconUrl: "https://www.typescriptlang.org/favicon-32x32.png",
+        active: false,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%231f2428'/%3E%3Crect x='30' y='30' width='160' height='24' rx='4' fill='%233178c6'/%3E%3Crect x='30' y='75' width='320' height='140' rx='8' fill='%2324292e'/%3E%3C/svg%3E"
+      },
+      {
+        id: 103,
+        title: "Hacker News - Y Combinator",
+        domain: "news.ycombinator.com",
+        favIconUrl: "https://news.ycombinator.com/favicon.ico",
+        active: false,
+        snapshot: null
+      },
+      {
+        id: 104,
+        title: "Anthropic \u2014 Claude AI Research & Safety",
+        domain: "anthropic.com",
+        favIconUrl: "https://anthropic.com/favicon.ico",
+        active: false,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%23141413'/%3E%3Ctext x='40' y='100' fill='%23d97706' font-size='32' font-family='sans-serif' font-weight='bold'%3EAnthropic%3C/text%3E%3Crect x='40' y='130' width='300' height='14' rx='3' fill='%23ffffff' fill-opacity='0.2'/%3E%3C/svg%3E"
+      },
+      {
+        id: 105,
+        title: "MDN Web Docs - CSS 3D Transforms",
+        domain: "developer.mozilla.org",
+        favIconUrl: "https://developer.mozilla.org/favicon-48x48.png",
+        active: false,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%231b1b1b'/%3E%3Crect x='30' y='30' width='120' height='24' rx='4' fill='%23005a9c'/%3E%3Crect x='30' y='70' width='340' height='150' rx='6' fill='%232b2b2b'/%3E%3C/svg%3E"
+      },
+      {
+        id: 106,
+        title: "Google DeepMind - Research & Robotics",
+        domain: "deepmind.google",
+        favIconUrl: "https://www.google.com/favicon.ico",
+        active: false,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%230b0e14'/%3E%3Ccircle cx='100' cy='130' r='50' fill='%2300e5ff' fill-opacity='0.4'/%3E%3Ccircle cx='200' cy='130' r='70' fill='%234285f4' fill-opacity='0.3'/%3E%3C/svg%3E"
+      },
+      {
+        id: 107,
+        title: "Linear \u2014 The issue tracking tool you'll actually love",
+        domain: "linear.app",
+        favIconUrl: "https://linear.app/favicon.ico",
+        active: false,
+        snapshot: null
+      },
+      {
+        id: 108,
+        title: "Vite | Next Generation Frontend Tooling",
+        domain: "vitejs.dev",
+        favIconUrl: "https://vitejs.dev/logo.svg",
+        active: false,
+        snapshot: "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='260' viewBox='0 0 400 260'%3E%3Crect width='400' height='260' fill='%231a1a2e'/%3E%3Cpath d='M200 40 L280 200 L120 200 Z' fill='%23bd34fe' fill-opacity='0.5'/%3E%3C/svg%3E"
+      }
+    ];
+
+    chrome.runtime.sendMessage = function(request, callback) {
+      if (request.action === 'GET_TABS') {
+        setTimeout(() => callback({ success: true, tabs: MOCK_TABS }), 40);
+      } else if (request.action === 'SWITCH_TAB') {
+        const tab = MOCK_TABS.find(t => t.id === request.tabId);
+        document.getElementById('statusMsg').textContent = 'Switched to tab: ' + (tab ? tab.title : request.tabId);
+        if (callback) callback({ success: true });
+      } else if (request.action === 'CLOSE_TAB') {
+        const idx = MOCK_TABS.findIndex(t => t.id === request.tabId);
+        if (idx !== -1) MOCK_TABS.splice(idx, 1);
+        if (callback) callback({ success: true });
+      }
+    };
+
+    chrome.runtime.onMessage = {
+      addListener: function(fn) {
+        window.__mockOnMessage = fn;
+      }
+    };
+  </script>
+
+  <!-- Load content script -->
+  <script src="content.js"></script>
+
+  <script>
+    document.getElementById('openBtn').addEventListener('click', () => {
+      if (window.__mockOnMessage) {
+        window.__mockOnMessage({ action: 'CYCLE_OR_OPEN' }, {}, () => {});
+      }
+    });
+  </script>
+</body>
+</html>
